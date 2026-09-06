@@ -140,14 +140,18 @@ class NoOrders:
         return {"ticket": ticket, "close_price": 0.0}
 
 
-def build(tmp: Path, policy: dict, market, uri_template: str):
+def build(tmp: Path, policy: dict, market, uri_template: str,
+          publish_root: Path = None):
     journal = Journal(tmp / "trades.jsonl")
     ledger = EdgeLedger(policy, tmp / "edge.jsonl")
     risk = RiskAdapter(zones=ZoneTracker(policy),
                        signal_coherence=SignalCoherence(policy),
                        model_coherence=ModelCoherence(policy, tmp / "out.json"),
                        journal=journal)
-    publisher = Publisher(tmp / "dossiers", uri_template=uri_template)
+    # When publishing into a real repo, its root IS the dossier root — the
+    # URL in the record has to match where the file actually lands.
+    publisher = Publisher(publish_root or (tmp / "dossiers"),
+                          uri_template=uri_template)
     outbox = Outbox(tmp / "outbox.jsonl")
     index = AnchorIndex(tmp / "index.jsonl")
 
@@ -224,6 +228,9 @@ def main() -> int:
     ap.add_argument("--market", help="JSON snapshot from Agent OS")
     ap.add_argument("--uri", default="https://raw.githubusercontent.com/"
                                      "ascestark1/zcastor-dossiers/main/{path}")
+    ap.add_argument("--publish-to", metavar="DIR",
+                    help="also write the record into a real dossier repo, so "
+                         "the printed URL actually resolves once pushed")
     args = ap.parse_args()
 
     if args.market:
@@ -254,9 +261,12 @@ def main() -> int:
         say(f"     cost is the fee, not the spread")
 
     with tempfile.TemporaryDirectory() as d:
+        # A demo that prints a URL nobody can fetch is a demo of nothing, so
+        # --publish-to writes the record where the URL says it lives.
         tmp = Path(d)
         engine, rollover, publisher, outbox, index, n_gates = build(
-            tmp, policy, DemoMarket(market), args.uri)
+            tmp, policy, DemoMarket(market), args.uri,
+            publish_root=Path(args.publish_to) if args.publish_to else None)
 
         heading(2, f"{n_gates} gates evaluate each signal")
         say(f"     policy {engine.policy_hash[:26]}…\n")
@@ -308,6 +318,10 @@ def main() -> int:
         say(f"     {checksum_bytes(raw)[7:]}")
         say(f"\n     anchored:  {result['checksum'][7:]}")
         say(f"     match:     {checksum_bytes(raw) == result['checksum']}")
+
+        if args.publish_to:
+            say(f"\n     written to {publisher.root / path}")
+            say("     commit and push it, and the URL above resolves for anyone")
 
         say(f"\n{BAR}")
         say("  The trades are a by-product. The record is the product.")
