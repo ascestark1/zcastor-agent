@@ -4,11 +4,7 @@
 
 Built for the Binance Agent OS Mini Hackathon. Reads live market state through
 Agent OS, decides, and anchors every decision on NVNM Chain **before the outcome
-is known** — including the decisions to do nothing.
-
-```
-python3 ops/demo/run_demo.py
-```
+is known** — including the refusals decisions.
 
 ---
 
@@ -61,26 +57,6 @@ permanently. Republishing writes a new file and marks the old record
 
 ---
 
-## Running it
-
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install web3 eth-account            # only needed to anchor
-python3 tests/run_all.py                # 442 tests, no network, no venue
-python3 ops/demo/run_demo.py            # the full loop, offline
-```
-
-Against live Binance data through Agent OS:
-
-```bash
-python3 ops/demo/run_demo.py --market market.json
-```
-
-Against Binance directly (testnet keys from testnet.binance.vision):
-
-```bash
-export BINANCE_API_KEY=... BINANCE_API_SECRET=...
-python3 ops/scripts/smoke_binance.py
 ```
 
 ## Layout
@@ -131,15 +107,13 @@ test asserting both adapters satisfy the same interface.
 
 ---
 
-## Honest status
+## Status
 
-**No demonstrated edge.** Every segment of the performance ledger stays in
-shadow until it has at least forty measured outcomes and a positive lower
+Every segment of the performance ledger stays in
+shadow until it has at least 400 measured outcomes and a positive lower
 confidence bound. None have reached it, and the ledger reports that rather than
 hiding it. Stops were recently widened after measuring that spread was consuming
-half the risk on fast timeframes, which reset the evidence to zero. That is the
-cost of measuring honestly.
-
+half the risk on fast timeframes, which reset the evidence to zero.
 **The desk is human-managed.** Finance directors set the mandate and approve
 what trades. This runs alongside them and takes fewer positions. The
 accountability layer arrives before the autonomy, not after it.
@@ -148,11 +122,4 @@ accountability layer arrives before the autonomy, not after it.
 polling loop, not by the exchange. If the process dies with a position open,
 nothing closes it. An exchange-side OCO would fix this and is not built yet.
 
-**One month of measurement**, one instrument. Anything derived from it is a
-hypothesis to test, not a result.
-
 ---
-
-An accountability system whose first honest output is "we cannot yet say this
-works" is doing what it was built for. If it reported otherwise on the available
-evidence, the reporting would be the broken part.
