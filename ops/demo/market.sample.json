@@ -1,0 +1,15 @@
+{
+  "source": "Binance Agent OS \u2014 spot.ticker24hr BTCUSDT",
+  "captured_at": "2026-09-05T18:55:07Z",
+  "symbol": "BTCUSDT",
+  "ask": 79784.63,
+  "bid": 79784.62,
+  "commission_rate": 0.001,
+  "balance": 10000.0,
+  "session": "London",
+  "session_open": 79657.53,
+  "high_24h": 80200.0,
+  "low_24h": 79545.96,
+  "volume_24h": 9483.39571,
+  "time": 1788677707.012
+}
